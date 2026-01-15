@@ -3,9 +3,9 @@ from app.extensions import db
 
 class AuthService:
     @staticmethod
-    def register_user(email,password):
+    def register_user(email, password):
         if User.query.filter_by(email=email).first():
-            raise ValueError("Email Alreay Registered")
+            raise ValueError("Email Already Registered")
         
         try:
             new_user = User(email=email)
@@ -19,10 +19,10 @@ class AuthService:
             raise e
         
     @staticmethod
-    def authenticate_user(email,password):
+    def authenticate_user(email, password):
         user = User.query.filter_by(email=email).first()
         if user and user.check_password(password):
-            if user.is_activate_status is False:
+            if user.is_active_status is False:
                 raise ValueError("Account is banned, contact support")
             return user
         return None
