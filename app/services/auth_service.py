@@ -22,5 +22,7 @@ class AuthService:
     def authenticate_user(email,password):
         user = User.query.filter_by(email=email).first()
         if user and user.check_password(password):
+            if user.is_activate_status is False:
+                raise ValueError("Account is banned, contact support")
             return user
         return None

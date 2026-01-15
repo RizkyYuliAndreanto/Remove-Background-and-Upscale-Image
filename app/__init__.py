@@ -24,6 +24,10 @@ def create_app(config_class=Config):
     from app.routes.auth_routes import auth_bp
     app.register_blueprint(auth_bp,url_prefix='/api/v1/auth')
 
+#ADMIN ROOUTES
+    from app.routes.admin.admin_routes import admin_bp
+    app.register_blueprint(admin_bp,url_prefix='/api/v1/admin')
+
     @app.route('/')
     def index():
         return{
