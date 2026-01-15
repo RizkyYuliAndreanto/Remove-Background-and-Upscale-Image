@@ -1,0 +1,29 @@
+# --- Core Framework & Server ---
+Flask
+python-dotenv
+flask-cors
+gunicorn
+
+# --- Database & Migrations ---
+Flask-SQLAlchemy
+Flask-Migrate
+psycopg2-binary
+
+# --- Authentication & Security ---
+Flask-Login
+PyJWT
+email-validator
+Werkzeug
+
+# --- Input Validation ---
+marshmallow
+
+# --- Image Processing Basics ---
+Pillow          # Manipulasi dasar (Resize, Convert format)
+numpy           # Wajib untuk konversi array gambar (Matrix matematika)
+
+# --- AI & Image Processing Logic (INTI FITUR) ---
+rembg           # Library terbaik Python untuk Remove Background (U2-Net)
+onnxruntime     # Engine untuk menjalankan model AI 'rembg' dengan cepat (CPU)
+opencv-python   # (cv2) Untuk Upscaling algoritma dan computer vision advanced
+requests        # Jika nanti ingin hybrid (sebagian pakai API luar)
