@@ -45,6 +45,11 @@ def create_app(config_class=Config):
     from app.routes.admin.admin_routes import admin_bp
     app.register_blueprint(admin_bp, url_prefix='/api/v1/admin')
 
+    #IMAGE ROUTES
+    from app.routes.image_routes import image_bp
+    
+    app.register_blueprint(image_bp, url_prefix='/api/v1/images')
+
     @app.route('/')
     def index():
         return {

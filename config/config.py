@@ -13,3 +13,8 @@ class Config:
     HOST = os.getenv('HOST')
     INTERNAL_SERVICE_KEY = os.getenv('INTERNAL_SERVICE_KEY')
     
+    # Image Processing Configuration
+    UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'uploads')
+    ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+    MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB max file size
+    
