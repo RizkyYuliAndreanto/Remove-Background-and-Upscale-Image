@@ -1,42 +1,67 @@
+
 from functools import wraps
-from flask import jsonify
-from flask_login import current_user
+from flask import jsonify, g
 
-# --- 1. ADMIN ONLY ---
+# Import api_key_required dari security module
+from app.decorators.security import api_key_required
+
+
 def admin_required(f):
+    
     @wraps(f)
-    def decorated_function(*args, **kwargs):
+    @api_key_required 
+    def decorated_function(*args, **kwargs):    
        
-        from flask import g
-        user = current_user if current_user.is_authenticated else getattr(g, 'current_user', None)
-
-        if not user:
-             return jsonify({"status": "error", "message": "Login required"}), 401
+        if g.current_user.role != 'admin':
+            return jsonify({
+                "status": "error",
+                "message": "Access Denied: Admin access required"
+            }), 403
         
-        if user.role != 'admin':
-            return jsonify({
-                "status": "error", 
-                "message": "Access Denied: Admins only"
-            }), 403
-            
         return f(*args, **kwargs)
     return decorated_function
 
-# --- 2. PREMIUM ONLY (Persiapan Masa Depan) ---
+
 def premium_required(f):
+    """
+    Decorator untuk memastikan user adalah premium member
+    Otomatis mengecek API Key terlebih dahulu, lalu role
+    """
     @wraps(f)
+    @api_key_required  # ✅ Auto-apply API key validation
     def decorated_function(*args, **kwargs):
-        from flask import g
-        user = current_user if current_user.is_authenticated else getattr(g, 'current_user', None)
-
-        if not user:
-             return jsonify({"status": "error", "message": "Login required"}), 401
-
-        if user.role not in ['premium', 'admin']:
+        # g.current_user sudah di-set oleh @api_key_required
+        if g.current_user.role not in ['premium', 'admin']:
             return jsonify({
-                "status": "error", 
-                "message": "Upgrade to Premium required"
+                "status": "error",
+                "message": "Premium subscription required"
             }), 403
-            
+        
         return f(*args, **kwargs)
     return decorated_function
+
+
+def role_required(role_name):
+    """
+    Decorator factory untuk validasi role spesifik
+    Otomatis mengecek API Key terlebih dahulu, lalu role
+    Contoh penggunaan: @role_required('editor')
+    """
+    def decorator(f):
+        @wraps(f)
+        @api_key_required  # ✅ Auto-apply API key validation
+        def decorated_function(*args, **kwargs):
+            # g.current_user sudah di-set oleh @api_key_required
+            user_role = g.current_user.role
+            
+            if user_role != role_name:
+                return jsonify({
+                    "status": "error",
+                    "message": f"Role '{role_name}' required"
+                }), 403
+            
+            return f(*args, **kwargs)
+        
+        return decorated_function
+    
+    return decorator

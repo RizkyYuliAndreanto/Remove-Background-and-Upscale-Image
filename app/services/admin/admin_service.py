@@ -4,29 +4,28 @@ from app.extensions import db
 class AdminService:
     @staticmethod
     def get_all_user():
-        def get_all_users():
-            users = User.query.all()
-            return [user.to_dict()for user in users]
+        users = User.query.all()
+        return [user.to_dict() for user in users]
+    
+    @staticmethod
+    def ban_user(user_id):
+        user = User.query.get(user_id)
+        if not user:
+            raise ValueError("User not found")
         
-        @staticmethod
-        def ban_user(user_id):
-            user =User.quey.get(user_id)
-            if not user:
-                raise ValueError("User not found")
-            
-            if user.role =='admin':
-                raise ValueError("Cannot ban an admin user")
-            
-            user.is_activate_status=False
-            db.session.commit()
-            return user
+        if user.role == 'admin':
+            raise ValueError("Cannot ban an admin user")
         
-        @staticmethod
-        def unban_user(user_id):
-            user = User.query.get(user_id)
-            if not user :
-                raise ValueError("user not found")
-            
-            user.is_activate_status=True
-            db.session.commit()
-            return user
+        user.is_active_status = False
+        db.session.commit()
+        return user
+    
+    @staticmethod
+    def unban_user(user_id):
+        user = User.query.get(user_id)
+        if not user:
+            raise ValueError("User not found")
+        
+        user.is_active_status = True
+        db.session.commit()
+        return user
