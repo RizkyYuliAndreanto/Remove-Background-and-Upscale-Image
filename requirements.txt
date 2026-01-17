@@ -21,6 +21,7 @@ marshmallow
 # --- Image Processing Basics ---
 Pillow          # Manipulasi dasar (Resize, Convert format)
 numpy           # Wajib untuk konversi array gambar (Matrix matematika)
+scipy           # Advanced image processing & morphological operations
 
 # --- AI & Image Processing Logic (INTI FITUR) ---
 rembg           # Library terbaik Python untuk Remove Background (U2-Net)

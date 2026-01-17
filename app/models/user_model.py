@@ -73,6 +73,8 @@ class User(UserMixin, db.Model):
     
     def increment_failed_login(self):
         """Track failed login attempts and lock account after 5 attempts"""
+        if self.failed_login_attempts is None:
+            self.failed_login_attempts = 0
         self.failed_login_attempts += 1
         if self.failed_login_attempts >= 5:
             from datetime import timedelta
@@ -92,6 +94,11 @@ class User(UserMixin, db.Model):
         """Reset monthly quota if new month"""
         from datetime import timedelta
         now = datetime.utcnow()
+        # Initialize if None
+        if self.last_quota_reset is None:
+            self.last_quota_reset = now
+            self.usage_count = 0
+            return
         # Reset if 30 days have passed
         if (now - self.last_quota_reset).days >= 30:
             self.usage_count = 0
@@ -102,10 +109,16 @@ class User(UserMixin, db.Model):
         if self.role in ['admin', 'premium']:
             return True
         self.check_and_reset_quota()
+        if self.usage_count is None:
+            self.usage_count = 0
+        if self.monthly_quota is None:
+            self.monthly_quota = 10
         return self.usage_count < self.monthly_quota
     
     def increment_usage(self):
         """Increment usage count"""
+        if self.usage_count is None:
+            self.usage_count = 0
         self.usage_count += 1
     
     def generate_reset_token(self):
@@ -134,13 +147,16 @@ class User(UserMixin, db.Model):
         Args:
             include_api_key (bool): Whether to include API key in response (only for login/register)
         """
+        usage_count = self.usage_count if self.usage_count is not None else 0
+        monthly_quota = self.monthly_quota if self.monthly_quota is not None else 10
+        
         data = {
             "id": self.id,
             "email": self.email,
             "role": self.role,
-            "usage_count": self.usage_count,
-            "monthly_quota": self.monthly_quota,
-            "quota_remaining": self.monthly_quota - self.usage_count if self.role == 'user' else 'unlimited',
+            "usage_count": usage_count,
+            "monthly_quota": monthly_quota,
+            "quota_remaining": monthly_quota - usage_count if self.role == 'user' else 'unlimited',
             "last_login": self.last_login.isoformat() if self.last_login else None,
             "is_active": self.is_active_status,
             "created_at": self.created_at.isoformat(),
