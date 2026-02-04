@@ -1,4 +1,4 @@
-from flask import jsonify, current_app
+from flask import jsonify, current_app, request
 from app.services.admin.admin_service import AdminService
 
 def list_users():
@@ -15,6 +15,37 @@ def list_users():
         return jsonify({
             "status": "error",
             "message": str(e)
+        }), 500
+
+def change_role(user_id):
+    try:
+        data = request.get_json()
+        new_role = data.get('role')
+        
+        if not new_role:
+            return jsonify({
+                "status": "error",
+                "message": "Role is required"
+            }), 400
+        
+        user, old_role = AdminService.change_user_role(user_id, new_role)
+        current_app.logger.info(f"User {user_id} role changed from {old_role} to {new_role}")
+        return jsonify({
+            "status": "success",
+            "message": f"User role changed from {old_role} to {new_role}",
+            "data": user.to_dict()
+        }), 200
+    except ValueError as e:
+        current_app.logger.warning(f"Change role failed: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        }), 400
+    except Exception as e:
+        current_app.logger.error(f"Error changing user role: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "message": "Internal server error"
         }), 500
     
 def ban_user(user_id):

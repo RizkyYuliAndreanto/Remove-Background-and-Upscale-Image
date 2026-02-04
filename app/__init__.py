@@ -50,6 +50,10 @@ def create_app(config_class=Config):
     
     app.register_blueprint(image_bp, url_prefix='/api/v1/images')
 
+    # UPSCALE ROUTES    
+    from app.routes.upscale_routes import upscale_bp
+    app.register_blueprint(upscale_bp, url_prefix='/api/v1/upscale')
+
     @app.route('/')
     def index():
         return {
